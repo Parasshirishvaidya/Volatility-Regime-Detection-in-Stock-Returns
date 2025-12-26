@@ -1,0 +1,73 @@
+Log Retruns: -
+It measures how much the index price changed from one day to the next, in relative terms.
+
+Intuition: -
+Positive → market went up
+Negative → market went down
+Near zero → market was stable
+
+Volatality is defined as variation in returns, not prices
+
+
+Absolute Returns: -
+The magnitude of price movement, ignoring direction.
+
+Big market moves up or down -> Large Absolute returns
+clam markets -> Small Absolute returns
+
+High-volatility markets are characterized by large price swings, regardless of gain or loss.
+
+This helps clustering distinguish:
+Calm days
+Shock days
+
+Absolute returns capture the intensity of market movements, which is essential for identifying turbulent periods
+
+
+7-Day Rolling Volatality: -
+
+Standard deviation of returns over the last 7 trading days.
+Captures short-term risk
+Sensitive to sudden shocks
+Reacts quickly to news/events
+
+Sudden market stress
+Short-lived volatility spikes
+
+Short-term rolling volatility helps detect sudden regime shifts and market shocks.
+
+
+14-Day Rolling Volatility: -
+
+Volatility measured over two trading weeks.
+Smooths out daily noise
+Captures medium-term risk trends
+Markets don’t switch regimes instantly; this feature captures transition behavior.
+
+Medium-term volatility reflects sustained market uncertainty rather than daily noise
+
+
+30-Day Rolling Volatility: -
+
+Volatility over approximately one trading month.
+Represents long-term market risk
+Stable indicator of market regime
+Separates structural high-risk periods (e.g., crises)
+Less sensitive to daily fluctuations
+
+Long-term rolling volatility captures structural changes in market risk.
+
+
+Volume Change: -
+
+Day-to-day percentage change in trading volume.
+High volume → strong market participation
+Sudden volume spikes → panic or excitement
+
+High volatility + high volume → panic
+High volatility + low volume → low liquidity
+
+Volume change provides additional context on market participation during different volatility regimes
+
+
+I engineered return-based and rolling volatility features across multiple time horizons to capture both short-term shocks and long-term risk regimes, which are critical for understanding market behavior.

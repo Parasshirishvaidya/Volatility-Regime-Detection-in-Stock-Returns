@@ -1,0 +1,3 @@
+Financial markets do not behave uniformly over time. Periods of stability are often followed by periods of high uncertainty and risk, commonly referred to as volatility regimes. Identifying these regimes is crucial for risk management, portfolio allocation, and investment decision-making.
+
+The objective of this project is to analyze historical stock market returns and identify distinct volatility regimes using statistical measures and unsupervised machine learning techniques. By engineering features such as rolling volatility and return behavior, the project aims to classify market conditions into low-, medium-, and high-volatility regimes and interpret their characteristics.   
