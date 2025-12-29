@@ -4,10 +4,10 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-with open(r"C:\Data Science Learning\Projects\Volatility Regime Detection in Stock Returns\model\hmm_model.pkl","rb") as f:
+with open("\model\hmm_model.pkl","rb") as f:
     hmm_model = pickle.load(f)
 
-with open(r"C:\Data Science Learning\Projects\Volatility Regime Detection in Stock Returns\model\regime_map.pkl","rb") as f:
+with open("model\regime_map.pkl","rb") as f:
     regime_map = pickle.load(f)
 
 ## App Title
