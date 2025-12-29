@@ -4,3 +4,4 @@ pandas
 matplotlib
 scikit-learn
 hmmlearn
+Python 3.12.4
