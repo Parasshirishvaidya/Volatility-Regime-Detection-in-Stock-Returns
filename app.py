@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 with open("model/hmm_model.pkl","rb") as f:
     hmm_model = pickle.load(f)
@@ -43,6 +44,33 @@ if uploaded_file is not None:
         st.error("CSV must contain 'date' and 'close' columns")
     else:
         df=preprocess_data(df)
+        df.columns=df.columns.str.lower().str.strip()
+        column_map={
+            "adj close":"close",
+            "closing price":"close",
+            "close price":"close"
+        }
+        df.rename(columns=column_map,inplace=True)
+        df["date"]=pd.to_datetime(df["date"])
+        df=df.sort_values("date").reset_index(drop=True)
+
+        #Log returns
+        df["log_returns"]=np.log(df["close"]/df["close"].shift(1))
+
+        #Absolute Returns
+        df["abs_returns"]=df["log_returns"].abs()
+
+        #Rolling Volatility
+        df["vol_7"]=df["log_returns"].rolling(window=7).std()
+        df["vol_14"]=df["log_returns"].rolling(window=14).std()
+        df["vol_30"]=df["log_returns"].rolling(window=30).std()
+
+
+        #Dropna values
+        df=df.dropna().reset_index(drop=True)
+
+        FEATURE_COLS=["log_returns","vol_14"]
+
 
         X=df["log_returns"].values.reshape(-1,1)
 
@@ -77,6 +105,79 @@ if uploaded_file is not None:
             .reset_index()
         )
         st.dataframe(stats)
+
+
+    state_volatility = {}
+    for state in range(hmm_model.n_components):
+        state_volatility[state]=df.loc[
+            df["regime"]==state,"vol_14"
+        ].mean()
+
+    #Sort States by Volatility
+    sorted_states=sorted(state_volatility,key=state_volatility.get)
+
+    regime_map={
+        sorted_states[0]:"Low volatility (Stable Markets)",
+        sorted_states[1]:"Medium volatility (Transition Phase)",
+        sorted_states[2]:"High volatility Market (Market Stress)",
+    }
+    df["regime_label"]=df["regime"].map(regime_map)
+
+    fig=px.scatter(
+        df,
+        x="date",
+        y="close",
+        color="regime_label",
+        title="Market Regimes Detected using Hidden Markov Model",
+        color_discrete_map={
+            "Low Volatility (Stable Market)": "green",
+            "Low Volatility Sideways(Transition Phase)": "orange",
+            "High Volatility (Market Stress)": "red"
+        }
+    )
+
+    df["regime_label"]=df["regime"].map(regime_map)
+
+    st.markdown("""
+                ### 🔍 Interpretation
+                # - **Green (Low Volatility)**: Stable market conditions with predictable price movements.
+                # - **Orange (Low Volatility Sideways)**: Transitional phases where market sentiment shifts.
+                # - **Red (High Volatility)**: Stress regimes associated with uncertainty and large price swings.
+                The Hidden Markov Model identifies these regimes without supervision, learning latent market states directly from return dynamics.
+                """)
+    
+
+    fig,ax=plt.subplots(figsize=(14,6))
+    colors={
+        "Low volatility (Stable Markets)":"tab:blue",
+        "Medium volatility (Transition Phase)":"tab:orange",
+        "High volatility Market (Market Stress)":"tab:green"
+    }
+    regime_map = {
+        0: "Low volatility (Stable Markets)",
+        1: "Medium volatility (Transition Phase)",
+        2: "High volatility Market (Market Stress)"
+    }
+    st.write("Regime counts:", df["regime"].value_counts())
+    st.write("Regime counts:", df["regime_label"].value_counts())
+    for regime,color in colors.items():
+        subset=df[df["regime_label"]==regime]
+        ax.scatter(
+            subset["date"],
+            subset["close"],
+            label=regime,
+            s=12,
+            color=color
+        )
+        ax.set_title("Volatility Regimes Detected using HMM")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Index level")
+        ax.legend()
+        ax.grid(alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig)
+
+
 
 else:
     st.info("Please upload a CSV file to begin")
